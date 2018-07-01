@@ -13,7 +13,7 @@
 
 //==============================================================================
 SynthAudioProcessorEditor::SynthAudioProcessorEditor (SynthAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p)
+    : AudioProcessorEditor (&p), processor (p), stepSequencerPanel(p)
 {
     getLookAndFeel().setColour(ResizableWindow::backgroundColourId, Colour(224, 202, 60));
     addAndMakeVisible(squaresPanel);

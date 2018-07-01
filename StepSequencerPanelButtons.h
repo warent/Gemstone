@@ -14,9 +14,9 @@
 #include "StepSequencerButtonRow.h"
 
 struct StepSequencerPanelButtons : public Component {
-  StepSequencerPanelButtons() {
+  StepSequencerPanelButtons(SynthAudioProcessor& p) : processor(p) {
     for (auto i = 0; i < 16; i++) {
-        addAndMakeVisible(stepButtonRows.add(new StepSequencerButtonRow(i)));
+        addAndMakeVisible(stepButtonRows.add(new StepSequencerButtonRow(i, p)));
     }
   }
 
@@ -43,6 +43,7 @@ struct StepSequencerPanelButtons : public Component {
     fb.performLayout(getLocalBounds());
   }
 
-private:
+protected:
   OwnedArray<StepSequencerButtonRow> stepButtonRows;
+  SynthAudioProcessor& processor;
 };

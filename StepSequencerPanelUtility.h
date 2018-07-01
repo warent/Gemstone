@@ -11,12 +11,12 @@
 
 #endif /* StepSequencerPanelUtility_h */
 
-#include "StepSequencerImageButtonRow.h"
+#include "StepSequencerUtilityButtonRow.h"
 
 struct StepSequencerPanelUtility : public Component {
   StepSequencerPanelUtility() {
     for (auto i = 0; i < 16; i++) {
-        addAndMakeVisible(stepButtonRows.add(new StepSequencerImageButtonRow(i)));
+        addAndMakeVisible(stepButtonRows.add(new StepSequencerUtilityButtonRow(i)));
     }
   }
 
@@ -44,5 +44,5 @@ struct StepSequencerPanelUtility : public Component {
   }
 
 private:
-  OwnedArray<StepSequencerImageButtonRow> stepButtonRows;
+  OwnedArray<StepSequencerUtilityButtonRow> stepButtonRows;
 };

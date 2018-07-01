@@ -11,35 +11,55 @@
 
 #endif /* StepSequencerButtonRow_h */
 
-#include <map>
+#include "PluginProcessor.h"
 
 #pragma once
 
 struct StepSequencerButtonRow : public Component, Button::Listener {
-  StepSequencerButtonRow(int id, int buttonCount = 8) {
+  StepSequencerButtonRow(int id, SynthAudioProcessor& p, int buttonCount = 8) : processor(p) {
     isOddRow = id % 2 > 0;
+    rowId = id;
     for (auto i = 0; i < buttonCount; i++) {
         auto sb = stepButtons.add(new ShapeButton(String(i), Colour(0, 0, 0), Colour(255, 100, 100), Colour(255, 0, 0)));
         Path square;
         square.addRectangle(0, 0, 16, 16);
         sb->setShape(square, true, true, false);
         sb->addListener(this);
-        buttonIsToggled[String(i)] = false;
+        processor.buttonIsToggled[rowId][String(i)] = false;
         addAndMakeVisible(sb);
     }
   }
 
   void buttonClicked(Button* button) override {
-    buttonIsToggled[button->getName()] = !buttonIsToggled[button->getName()];
-    if (buttonIsToggled[button->getName()]) {
-      dynamic_cast<ShapeButton*>(button)->setColours(Colour(255, 0, 0), Colour(255, 100, 100), Colour(255, 0, 0));
+    this->setToggleButton(dynamic_cast<ShapeButton*>(button), !processor.buttonIsToggled[rowId][button->getName()]);
+  }
+
+  void buttonStateChanged(Button* button) override {
+  }
+
+  void toggleClearAll() {
+    for (auto* button : stepButtons) {
+      this->setToggleButton(button, false);
+    }
+  }
+  void toggleSetAll() {
+    for (auto* button : stepButtons) {
+      this->setToggleButton(button, false);
+    }
+  }
+  void toggleRandomizeAll() {
+    for (auto* button : stepButtons) {
+      this->setToggleButton(button, bool(rand() % static_cast<int>(2)));
+    }
+  }
+  void setToggleButton(ShapeButton* button, bool value) {
+    processor.buttonIsToggled[rowId][button->getName()] = value;
+    if (processor.buttonIsToggled[rowId][button->getName()]) {
+      button->setColours(Colour(255, 0, 0), Colour(255, 100, 100), Colour(255, 0, 0));
     } else {
       dynamic_cast<ShapeButton*>(button)->setColours(Colour(0, 0, 0), Colour(255, 100, 100), Colour(255, 0, 0));
     }
     button->repaint();
-  }
-
-  void buttonStateChanged(Button* button) override {
   }
 
   void paint (Graphics& g) override {
@@ -68,5 +88,6 @@ struct StepSequencerButtonRow : public Component, Button::Listener {
 private:
   OwnedArray<ShapeButton> stepButtons;
   bool isOddRow;
-  std::map<String, bool> buttonIsToggled;
+  int rowId;
+  SynthAudioProcessor& processor;
 };

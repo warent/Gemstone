@@ -16,7 +16,7 @@
 #include "StepSequencerPanelUtility.h"
 
 struct StepSequencerPanel : public Component {
-  StepSequencerPanel() {
+  StepSequencerPanel(SynthAudioProcessor& p) : processor(p), panelButtons(p) {
     addAndMakeVisible(panelSlider);
     addAndMakeVisible(panelButtons);
     addAndMakeVisible(panelUtility);
@@ -43,4 +43,5 @@ private:
   StepSequencerPanelButtons panelButtons;
   StepSequencerPanelSlider panelSlider;
   StepSequencerPanelUtility panelUtility;
+  SynthAudioProcessor& processor;
 };

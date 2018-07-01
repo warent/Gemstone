@@ -11,6 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include <map>
 
 //==============================================================================
 /**
@@ -58,10 +59,13 @@ public:
     //==============================================================================
     MidiKeyboardState keyboardState;
 
+    int stepSequencerCount;
+    std::map<String, bool> buttonIsToggled[16];
 private:
     //==============================================================================
     Synthesiser synth;
     MidiMessageCollector midiCollector;
+
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynthAudioProcessor)

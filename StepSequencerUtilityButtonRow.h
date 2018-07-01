@@ -1,23 +1,23 @@
 //
-//  StepSequencerImageButtonRow.h
+//  StepSequencerUtilityButtonRow.h
 //  Synth
 //
 //  Created by Wyatt Arent on 7/1/18.
 //
 
-#ifndef StepSequencerImageButtonRow_h
-#define StepSequencerImageButtonRow_h
+#ifndef StepSequencerUtilityButtonRow_h
+#define StepSequencerUtilityButtonRow_h
 
 
-#endif /* StepSequencerImageButtonRow_h */
+#endif /* StepSequencerUtilityButtonRow_h */
 
 #pragma once
 
-struct StepSequencerImageButtonRow : public Component {
-  StepSequencerImageButtonRow(int id) {
+struct StepSequencerUtilityButtonRow : public Component {
+  StepSequencerUtilityButtonRow(int id) {
     isOddRow = id % 2 > 0;
     rowId = id;
-    String idToName[3] = {"r", "a", "x"};
+    String idToName[3] = {"R", "A", "X"};
     for (auto i = 0; i < 3; i++) {
         auto ib = imageButtons.add(new TextButton(idToName[i]));
         addAndMakeVisible(ib);
