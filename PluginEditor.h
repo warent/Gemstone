@@ -12,8 +12,8 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
-#include "SquareComponent.h"
 #include "SquaresPanel.h"
+#include "StepSequencerPanel.h"
 
 //==============================================================================
 /**
@@ -33,6 +33,7 @@ private:
     // access the processor object that created it.
     SynthAudioProcessor& processor;
     SquaresPanel squaresPanel;
+    StepSequencerPanel stepSequencerPanel;
     
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynthAudioProcessorEditor)

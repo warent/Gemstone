@@ -17,7 +17,8 @@ SynthAudioProcessorEditor::SynthAudioProcessorEditor (SynthAudioProcessor& p)
 {
     getLookAndFeel().setColour(ResizableWindow::backgroundColourId, Colour(224, 202, 60));
     addAndMakeVisible(squaresPanel);
-    setSize(1024, 768);
+    addAndMakeVisible(stepSequencerPanel);
+    setSize(768, 576);
 }
 
 SynthAudioProcessorEditor::~SynthAudioProcessorEditor()
@@ -40,10 +41,10 @@ void SynthAudioProcessorEditor::resized()
 
     using Track = Grid::TrackInfo;
 
-    grid.templateRows    = { Track (1_fr), Track (1_fr), Track (1_fr) };
+    grid.templateRows    = { Track (2_fr), Track (1_fr), Track (4_fr) };
     grid.templateColumns = { Track (1_fr) };
 
-    grid.items = { GridItem (squaresPanel) };
+    grid.items = { GridItem (squaresPanel), GridItem(), GridItem (stepSequencerPanel) };
 
     grid.performLayout (getLocalBounds());
 }

@@ -11,6 +11,8 @@
 
 #endif /* SquaresPanel_h */
 
+#include "SquareComponent.h"
+
 struct SquaresPanel : public Component {
   SquaresPanel() {
     for (auto i = 0; i < 8; i++) {
@@ -30,7 +32,6 @@ struct SquaresPanel : public Component {
         FlexBox::AlignItems::center,
         FlexBox::JustifyContent::spaceAround);
 
-    // keyboardComponent.setBounds(10, 10, getWidth()-20, getHeight() - 20);
     for (auto* square : squares) {
         squaresContainer.items.add(FlexItem(*square).withMinWidth(64.0f).withMinHeight(64.0f));
     }
