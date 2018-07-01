@@ -16,7 +16,14 @@
 struct StepSequencerPanelUtility : public Component {
   StepSequencerPanelUtility() {
     for (auto i = 0; i < 16; i++) {
-        addAndMakeVisible(stepButtonRows.add(new StepSequencerUtilityButtonRow(i)));
+        addAndMakeVisible(stepButtonRows.add(new StepSequencerUtilityButtonRow(i, [&](int id, String name) {
+          if (name == "R")
+              onRandomizeExternal(id);
+          if (name == "A")
+              onSetAllExternal(id);
+          if (name == "X")
+              onClearExternal(id);
+        })));
     }
   }
 
@@ -43,6 +50,19 @@ struct StepSequencerPanelUtility : public Component {
     fb.performLayout(getLocalBounds());
   }
 
+  void onRandomize(std::function<void(int)> l) {
+    onRandomizeExternal = l;
+  }
+  void onClear(std::function<void(int)> l) {
+    onClearExternal = l;
+  }
+  void onSetAll(std::function<void(int)> l) {
+    onSetAllExternal = l;
+  }
+
+OwnedArray<StepSequencerUtilityButtonRow> stepButtonRows;
 private:
-  OwnedArray<StepSequencerUtilityButtonRow> stepButtonRows;
+  std::function<void(int)> onRandomizeExternal;
+  std::function<void(int)> onSetAllExternal;
+  std::function<void(int)> onClearExternal;
 };

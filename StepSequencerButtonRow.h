@@ -44,7 +44,7 @@ struct StepSequencerButtonRow : public Component, Button::Listener {
   }
   void toggleSetAll() {
     for (auto* button : stepButtons) {
-      this->setToggleButton(button, false);
+      this->setToggleButton(button, true);
     }
   }
   void toggleRandomizeAll() {
@@ -52,6 +52,7 @@ struct StepSequencerButtonRow : public Component, Button::Listener {
       this->setToggleButton(button, bool(rand() % static_cast<int>(2)));
     }
   }
+
   void setToggleButton(ShapeButton* button, bool value) {
     processor.buttonIsToggled[rowId][button->getName()] = value;
     if (processor.buttonIsToggled[rowId][button->getName()]) {

@@ -13,15 +13,24 @@
 
 #pragma once
 
-struct StepSequencerUtilityButtonRow : public Component {
-  StepSequencerUtilityButtonRow(int id) {
+struct StepSequencerUtilityButtonRow : public Component, Button::Listener {
+  StepSequencerUtilityButtonRow(int id, std::function<void(int, String)> onButtonClick) {
+    this->onButtonClick = onButtonClick;
     isOddRow = id % 2 > 0;
     rowId = id;
     String idToName[3] = {"R", "A", "X"};
     for (auto i = 0; i < 3; i++) {
         auto ib = imageButtons.add(new TextButton(idToName[i]));
+        ib->addListener(this);
         addAndMakeVisible(ib);
     }
+  }
+
+  void buttonClicked(Button* button) override {
+    onButtonClick(rowId, button->getName());
+  }
+
+  void buttonStateChanged(Button* button) override {
   }
 
   void paint (Graphics& g) override {
@@ -49,6 +58,7 @@ struct StepSequencerUtilityButtonRow : public Component {
 
 private:
   OwnedArray<TextButton> imageButtons;
+  std::function<void(int, String)> onButtonClick;
   bool isOddRow;
   int rowId;
 };

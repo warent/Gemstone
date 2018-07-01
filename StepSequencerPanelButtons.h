@@ -43,7 +43,7 @@ struct StepSequencerPanelButtons : public Component {
     fb.performLayout(getLocalBounds());
   }
 
+OwnedArray<StepSequencerButtonRow> stepButtonRows;
 protected:
-  OwnedArray<StepSequencerButtonRow> stepButtonRows;
   SynthAudioProcessor& processor;
 };

@@ -20,6 +20,16 @@ struct StepSequencerPanel : public Component {
     addAndMakeVisible(panelSlider);
     addAndMakeVisible(panelButtons);
     addAndMakeVisible(panelUtility);
+
+    panelUtility.onRandomize([&](int i) {
+      panelButtons.stepButtonRows[i]->toggleRandomizeAll();
+    });
+    panelUtility.onClear([&](int i) {
+      panelButtons.stepButtonRows[i]->toggleClearAll();
+    });
+    panelUtility.onSetAll([&](int i) {
+      panelButtons.stepButtonRows[i]->toggleSetAll();
+    });
   }
 
   void paint (Graphics& g) override {
