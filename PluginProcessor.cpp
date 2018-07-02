@@ -1,6 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include "SineWave.h"
+#include "synth/SineWave.h"
 
 //==============================================================================
 SynthAudioProcessor::SynthAudioProcessor()

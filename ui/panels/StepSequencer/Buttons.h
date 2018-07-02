@@ -11,7 +11,7 @@
 
 #endif /* StepSequencerPanelButtons_h */
 
-#include "StepSequencerButtonRow.h"
+#include "ButtonRow.h"
 
 struct StepSequencerPanelButtons : public Component {
   StepSequencerPanelButtons(SynthAudioProcessor& p) : processor(p) {

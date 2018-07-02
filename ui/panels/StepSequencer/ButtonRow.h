@@ -11,8 +11,6 @@
 
 #endif /* StepSequencerButtonRow_h */
 
-#include "PluginProcessor.h"
-
 #pragma once
 
 struct StepSequencerButtonRow : public Component, Button::Listener {
@@ -58,7 +56,7 @@ struct StepSequencerButtonRow : public Component, Button::Listener {
     if (processor.buttonIsToggled[rowId][button->getName()]) {
       button->setColours(Colour(255, 0, 0), Colour(255, 100, 100), Colour(255, 0, 0));
     } else {
-      dynamic_cast<ShapeButton*>(button)->setColours(Colour(0, 0, 0), Colour(255, 100, 100), Colour(255, 0, 0));
+      button->setColours(Colour(0, 0, 0), Colour(255, 100, 100), Colour(255, 0, 0));
     }
     button->repaint();
   }

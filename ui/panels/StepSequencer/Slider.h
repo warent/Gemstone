@@ -11,7 +11,7 @@
 
 #endif /* StepSequencerPanelSlider_h */
 
-#include "ReverseSlider.h"
+#include "../../components/ReverseSlider.h"
 
 struct StepSequencerPanelSlider : public Component {
   StepSequencerPanelSlider() {

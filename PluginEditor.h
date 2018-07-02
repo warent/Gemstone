@@ -12,8 +12,8 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
-#include "SquaresPanel.h"
-#include "StepSequencerPanel.h"
+#include "ui/panels/Gems/Main.h"
+#include "ui/panels/StepSequencer/Main.h"
 
 //==============================================================================
 /**

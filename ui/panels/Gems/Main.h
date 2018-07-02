@@ -11,7 +11,7 @@
 
 #endif /* SquaresPanel_h */
 
-#include "SquareComponent.h"
+#include "../../components/Gem.h"
 
 struct SquaresPanel : public Component {
   SquaresPanel() {

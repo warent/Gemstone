@@ -11,7 +11,7 @@
 
 #endif /* StepSequencerPanelUtility_h */
 
-#include "StepSequencerUtilityButtonRow.h"
+#include "UtilityButtonsRow.h"
 
 struct StepSequencerPanelUtility : public Component {
   StepSequencerPanelUtility() {
