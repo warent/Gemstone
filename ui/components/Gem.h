@@ -1,15 +1,15 @@
 //
-//  ComponentSquare.h
+//  Gem.h
 //  Synth
 //
 //  Created by Wyatt Arent on 7/1/18.
 //
 
-#ifndef ComponentSquare_h
-#define ComponentSquare_h
+#ifndef Gem_h
+#define Gem_h
 
 
-#endif /* ComponentSquare_h */
+#endif /* Gem_h */
 
 #include "ShapeButtonHitPath.h"
 
@@ -24,7 +24,16 @@ struct SquareComponent : public Component {
         addAndMakeVisible(buttonBottom);
         addAndMakeVisible(buttonRight);
         addAndMakeVisible(buttonLeft);
+    }
 
+    void paint (Graphics& g) override {
+        auto bounds = getLocalBounds();
+
+        FillType ft;
+        ft.setGradient(ColourGradient(Colour(72,85,99), 0, 0, Colour(0,0,0), bounds.getWidth()/2, bounds.getHeight()/2, true));
+
+        g.setFillType(ft);
+        g.fillRect(bounds.getWidth(), bounds.getHeight(), bounds.getWidth()+20, bounds.getHeight()+20);
     }
     
     void resized() override {

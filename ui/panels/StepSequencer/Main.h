@@ -21,19 +21,63 @@ struct StepSequencerPanel : public Component {
     addAndMakeVisible(panelButtons);
     addAndMakeVisible(panelUtility);
 
-    panelUtility.onRandomize([&](int i) {
+    panelUtility.onRandomize = [&](int i) {
       panelButtons.stepButtonRows[i]->toggleRandomizeAll();
-    });
-    panelUtility.onClear([&](int i) {
+    };
+    panelUtility.onClear = [&](int i) {
       panelButtons.stepButtonRows[i]->toggleClearAll();
-    });
-    panelUtility.onSetAll([&](int i) {
+    };
+    panelUtility.onSetAll = [&](int i) {
       panelButtons.stepButtonRows[i]->toggleSetAll();
+    };
+
+    panelSlider.setOnValueChange([&]() {
+      p.globalStepCount = panelSlider.getValue();
+      repaint();
     });
   }
 
   void paint (Graphics& g) override {
     g.fillAll(Colour(45, 48, 71));
+  }
+
+
+  void paintOverChildren(Graphics& g) override {
+    auto panelButtonsBounds = panelButtons.getBoundsInParent();
+    auto panelUtilityButtonsBounds = panelUtility.getBoundsInParent();
+
+    for (auto i = 0; i < processor.globalStepCount; i++) {
+      auto* buttonRow = panelButtons.stepButtonRows[i];
+      auto* utilityButtonRow = panelUtility.utilityButtonsRow[i];
+      buttonRow->setInterceptsMouseClicks(true, true);
+      utilityButtonRow->setInterceptsMouseClicks(true, true);
+    }
+
+    for (auto i = processor.globalStepCount; i < panelButtons.stepButtonRows.size(); i++) {
+      auto* buttonRow = panelButtons.stepButtonRows[i];
+      auto buttonRowBounds = buttonRow->getBoundsInParent();
+      g.setColour(Colour(0, 0, 0));
+      g.setOpacity(0.7);
+      g.fillRect(
+        panelButtonsBounds.getX(),
+        buttonRowBounds.getY(),
+        buttonRowBounds.getWidth(),
+        buttonRowBounds.getHeight()
+      );
+      buttonRow->setInterceptsMouseClicks(false, false);
+
+      auto* utilityButtonRow = panelUtility.utilityButtonsRow[i];
+      auto utilityButtonRowBounds = utilityButtonRow->getBoundsInParent();
+      g.setColour(Colour(0, 0, 0));
+      g.setOpacity(0.7);
+      g.fillRect(
+        panelUtilityButtonsBounds.getX(),
+        utilityButtonRowBounds.getY(),
+        utilityButtonRowBounds.getWidth(),
+        utilityButtonRowBounds.getHeight()
+      );
+      utilityButtonRow->setInterceptsMouseClicks(false, false);
+    }
   }
 
   void resized() override {

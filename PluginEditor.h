@@ -32,7 +32,7 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     SynthAudioProcessor& processor;
-    SquaresPanel squaresPanel;
+    GemsPanel gemsPanel;
     StepSequencerPanel stepSequencerPanel;
     
 

@@ -59,7 +59,7 @@ public:
     //==============================================================================
     MidiKeyboardState keyboardState;
 
-    int stepSequencerCount;
+    int globalStepCount = 4;
     std::map<String, bool> buttonIsToggled[16];
 private:
     //==============================================================================

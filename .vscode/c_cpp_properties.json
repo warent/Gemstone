@@ -3,7 +3,7 @@
         {
             "name": "Mac",
             "includePath": [
-                "${workspaceFolder}/**",
+                "${workspaceFolder}/**/**",
                 "${workspaceFolder}/../JuceLibraryCode/**",
                 "~/Moji/VST Development/JUCE/modules/**"
             ],
