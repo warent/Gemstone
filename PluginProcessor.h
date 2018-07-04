@@ -60,13 +60,20 @@ public:
     MidiKeyboardState keyboardState;
 
     int globalStepCount = 4;
-    std::map<String, bool> buttonIsToggled[16];
+    int currentGlobalStep = 0;
+    int synthStepCount[8];
+    int currentSynthStep[8];
+
+    // globalSynthIsActiveInStep[stepId][synthId]
+    bool globalSynthIsActiveInStep[16][8];
+    bool soundIsActiveInSynthStep[8][16][4];
+
+    std::map<int, std::pair<int, int>> midiNoteToSynth;
 private:
     //==============================================================================
-    Synthesiser synth;
+    Synthesiser synths[8][4];
     MidiMessageCollector midiCollector;
 
-    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynthAudioProcessor)
 };

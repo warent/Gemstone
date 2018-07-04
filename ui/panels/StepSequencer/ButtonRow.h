@@ -5,6 +5,8 @@
 //  Created by Wyatt Arent on 7/1/18.
 //
 
+#include <string>
+
 #ifndef StepSequencerButtonRow_h
 #define StepSequencerButtonRow_h
 
@@ -23,13 +25,15 @@ struct StepSequencerButtonRow : public Component, Button::Listener {
         square.addRectangle(0, 0, 16, 16);
         sb->setShape(square, true, true, false);
         sb->addListener(this);
-        processor.buttonIsToggled[rowId][String(i)] = false;
+        processor.globalSynthIsActiveInStep[rowId][i] = false;
         addAndMakeVisible(sb);
     }
   }
 
   void buttonClicked(Button* button) override {
-    this->setToggleButton(dynamic_cast<ShapeButton*>(button), !processor.buttonIsToggled[rowId][button->getName()]);
+    auto nameChrPointer = button->getName().getCharPointer();
+    auto buttonId = int(CharacterFunctions::readDoubleValue<CharPointer_UTF8>(nameChrPointer));
+    this->setToggleButton(dynamic_cast<ShapeButton*>(button), !processor.globalSynthIsActiveInStep[rowId][buttonId]);
   }
 
   void buttonStateChanged(Button* button) override {
@@ -52,8 +56,10 @@ struct StepSequencerButtonRow : public Component, Button::Listener {
   }
 
   void setToggleButton(ShapeButton* button, bool value) {
-    processor.buttonIsToggled[rowId][button->getName()] = value;
-    if (processor.buttonIsToggled[rowId][button->getName()]) {
+    auto nameChrPointer = button->getName().getCharPointer();
+    auto buttonId = int(CharacterFunctions::readDoubleValue<CharPointer_UTF8>(nameChrPointer));
+    processor.globalSynthIsActiveInStep[rowId][buttonId] = value;
+    if (processor.globalSynthIsActiveInStep[rowId][buttonId]) {
       button->setColours(Colour(255, 0, 0), Colour(255, 100, 100), Colour(255, 0, 0));
     } else {
       button->setColours(Colour(0, 0, 0), Colour(255, 100, 100), Colour(255, 0, 0));

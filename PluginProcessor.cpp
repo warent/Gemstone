@@ -15,10 +15,20 @@ SynthAudioProcessor::SynthAudioProcessor()
                        )
 #endif
 {
-    for (auto i = 0; i < 15; i++) {
-        synth.addVoice(new SineWaveVoice());
+    for (auto i = 0; i < 8; i++) {
+        for (auto j = 0; j < 4; j++) {
+            synths[i][j].addVoice(new SineWaveVoice());
+            synths[i][j].addSound(new SineWaveSound());
+            synths[i][j].setNoteStealingEnabled(true);
+        }
     }
-    synth.addSound(new SineWaveSound());
+
+    std::fill_n(synthStepCount, 8, 0);
+    std::fill_n(currentSynthStep, 8, 0);
+
+    for (auto i = 0; i < 16; i++) {
+        std::fill_n(globalSynthIsActiveInStep[i], 8, false);
+    }
 }
 
 SynthAudioProcessor::~SynthAudioProcessor()
@@ -90,7 +100,11 @@ void SynthAudioProcessor::changeProgramName (int index, const String& newName)
 //==============================================================================
 void SynthAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    synth.setCurrentPlaybackSampleRate (sampleRate);
+    for (auto i = 0; i < 8; i++) {
+        for (auto j = 0; j < 4; j++) {
+            synths[i][j].setCurrentPlaybackSampleRate (sampleRate);
+        }
+    }
     midiCollector.reset (sampleRate);
 }
 
@@ -127,10 +141,48 @@ bool SynthAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) co
 void SynthAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
     ScopedNoDenormals noDenormals;
-
     keyboardState.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
-    synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+
+    if (globalStepCount == 0) {
+        midiMessages.clear();
+        return;
+    }
+
+    Array<int> synthIds = {};
+    for (auto i = 0; i < 8; i++) {
+        if (globalSynthIsActiveInStep[currentGlobalStep][i]) {
+            synthIds.add(i);
+        } 
+    }
+
+    auto selectedSynthRandomIndex = rand() % static_cast<int>(synthIds.size() - 1);
+    auto selectedSynthId = synthIds[selectedSynthRandomIndex];
+    
+    auto selectedSoundId = 0;
+
+    int* samplePosition;
+    MidiMessage* midi;
+    while (MidiBuffer::Iterator::Iterator(midiMessages).getNextEvent(*midi, *samplePosition)) {
+        // If note-on, map it to the current selectedSynthId so that the future note-off can be routed properly
+        // Otherwise we'll end up with a note-off being routed to a random synth id as if it's note-on
+        if (midi->isMidiStart()) {
+            midiNoteToSynth[midi->getNoteNumber()] = std::pair<int, int>(selectedSynthId, selectedSoundId);
+        } else if (midi->isMidiStop()) {
+            auto gemId = midiNoteToSynth[midi->getNoteNumber()].first;
+            auto soundId = midiNoteToSynth[midi->getNoteNumber()].second;
+            synths[gemId][soundId].renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+            midiMessages.clear();
+            return;
+        }
+    }
+
+    synths[selectedSynthId][selectedSoundId].renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
     midiMessages.clear();
+
+    currentGlobalStep += 1;
+    if (currentGlobalStep >= globalStepCount) {
+        currentGlobalStep = 0;
+    }
 }
 
 //==============================================================================
