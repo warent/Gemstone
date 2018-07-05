@@ -58,6 +58,7 @@ struct StepSequencerButtonRow : public Component, Button::Listener {
   void setToggleButton(ShapeButton* button, bool value) {
     auto nameChrPointer = button->getName().getCharPointer();
     auto buttonId = int(CharacterFunctions::readDoubleValue<CharPointer_UTF8>(nameChrPointer));
+    std::cout << processor.globalSynthIsActiveInStep << " " << rowId << " " << buttonId << "\n";
     processor.globalSynthIsActiveInStep[rowId][buttonId] = value;
     if (processor.globalSynthIsActiveInStep[rowId][buttonId]) {
       button->setColours(Colour(255, 0, 0), Colour(255, 100, 100), Colour(255, 0, 0));

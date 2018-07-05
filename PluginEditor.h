@@ -13,7 +13,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
 #include "ui/panels/Gems/Main.h"
-#include "ui/panels/Tabs/Main.h"
+#include "ui/panels/ADSR/Main.h"
 #include "ui/panels/StepSequencer/Main.h"
 
 //==============================================================================
@@ -35,8 +35,8 @@ private:
     SynthAudioProcessor& processor;
     GemsPanel gemsPanel;
     StepSequencerPanel stepSequencerPanel;
-    TabsPanel tabsPanel;
-    
+    TabbedComponent tabsGemSettings;
+    ADSRPanel adsrPanel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynthAudioProcessorEditor)
 };

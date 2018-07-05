@@ -1,3 +1,5 @@
+#include <random>
+
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "synth/SineWave.h"
@@ -6,13 +8,13 @@
 SynthAudioProcessor::SynthAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", AudioChannelSet::stereo(), true)
-                     #endif
-                       )
+        #if ! JucePlugin_IsMidiEffect
+            #if ! JucePlugin_IsSynth
+            .withInput  ("Input",  AudioChannelSet::stereo(), true)
+            #endif
+        .withOutput ("Output", AudioChannelSet::stereo(), true)
+        #endif
+        )
 #endif
 {
     for (auto i = 0; i < 8; i++) {
@@ -141,48 +143,72 @@ bool SynthAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) co
 void SynthAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
     ScopedNoDenormals noDenormals;
-    keyboardState.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
 
     if (globalStepCount == 0) {
         midiMessages.clear();
         return;
     }
 
-    Array<int> synthIds = {};
-    for (auto i = 0; i < 8; i++) {
-        if (globalSynthIsActiveInStep[currentGlobalStep][i]) {
-            synthIds.add(i);
-        } 
-    }
+    int samplePosition = 0;
+    MidiMessage midi;
 
-    auto selectedSynthRandomIndex = rand() % static_cast<int>(synthIds.size() - 1);
-    auto selectedSynthId = synthIds[selectedSynthRandomIndex];
-    
-    auto selectedSoundId = 0;
+    Array<std::pair<MidiBuffer, std::pair<int, int>>> midiBufferForSynth;
 
-    int* samplePosition;
-    MidiMessage* midi;
-    while (MidiBuffer::Iterator::Iterator(midiMessages).getNextEvent(*midi, *samplePosition)) {
-        // If note-on, map it to the current selectedSynthId so that the future note-off can be routed properly
-        // Otherwise we'll end up with a note-off being routed to a random synth id as if it's note-on
-        if (midi->isMidiStart()) {
-            midiNoteToSynth[midi->getNoteNumber()] = std::pair<int, int>(selectedSynthId, selectedSoundId);
-        } else if (midi->isMidiStop()) {
-            auto gemId = midiNoteToSynth[midi->getNoteNumber()].first;
-            auto soundId = midiNoteToSynth[midi->getNoteNumber()].second;
-            synths[gemId][soundId].renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
-            midiMessages.clear();
-            return;
+    MidiBuffer::Iterator it(midiMessages);
+    while (it.getNextEvent(midi, samplePosition)) {
+        bool isNoteOn = midi.isNoteOn();
+        bool isNoteOff = midi.isNoteOff();
+        if (isNoteOn) {
+            Array<int> synthIds = {};
+            for (auto i = 0; i < 8; i++) {
+                if (globalSynthIsActiveInStep[currentGlobalStep][i]) {
+                    synthIds.add(i);
+                }
+            }
+
+            auto selectedSynthId = -1;
+            auto selectedSoundId = 0;
+
+            if (synthIds.size() > 0) {
+                std::mt19937 rng;
+                rng.seed(std::random_device()());
+                std::uniform_int_distribution<std::mt19937::result_type> dist(0,synthIds.size()-1);
+                selectedSynthId = synthIds[dist(rng)];
+            }
+            
+            currentGlobalStep += 1;
+            if (currentGlobalStep >= globalStepCount) {
+                currentGlobalStep = 0;
+            }
+
+            if (selectedSynthId == -1) {
+                continue;
+            }
+
+            midiBufferForSynth.add(std::pair<MidiBuffer, std::pair<int, int>>(MidiBuffer(MidiMessage(midi)), std::pair<int, int>(selectedSynthId, selectedSoundId)));
+            
+        } else if (isNoteOff) {
+            auto gemId = midiNoteToSynth[midi.getNoteNumber()].first;
+            auto soundId = midiNoteToSynth[midi.getNoteNumber()].second;
+            midiBufferForSynth.add(std::pair<MidiBuffer, std::pair<int, int>>(MidiBuffer(MidiMessage(midi)), std::pair<int, int>(gemId, soundId)));
         }
     }
-
-    synths[selectedSynthId][selectedSoundId].renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
-    midiMessages.clear();
-
-    currentGlobalStep += 1;
-    if (currentGlobalStep >= globalStepCount) {
-        currentGlobalStep = 0;
+    
+    for (auto item : midiBufferForSynth) {
+        auto selectedSynthId = item.second.first;
+        auto selectedSoundId = item.second.second;
+        auto singleBuffer = item.first;
+        synths[selectedSynthId][selectedSoundId].renderNextBlock(buffer, singleBuffer, 0, buffer.getNumSamples());
+        midiNoteToSynth[midi.getNoteNumber()] = std::pair<int, int>(selectedSynthId, selectedSoundId);
     }
+
+    midiMessages.clear();
+    
+    for (auto item : midiNoteToSynth) {
+        synths[item.second.first][item.second.second].renderNextBlock(buffer, MidiBuffer(), 0, buffer.getNumSamples());
+    }
+    
+    
 }
 
 //==============================================================================

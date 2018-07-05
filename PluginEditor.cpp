@@ -13,12 +13,13 @@
 
 //==============================================================================
 SynthAudioProcessorEditor::SynthAudioProcessorEditor (SynthAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p), stepSequencerPanel(p)
+    : AudioProcessorEditor (&p), processor (p), stepSequencerPanel(p), tabsGemSettings(TabbedButtonBar::Orientation::TabsAtTop)
 {
     getLookAndFeel().setColour(ResizableWindow::backgroundColourId, Colour(224, 202, 60));
     addAndMakeVisible(gemsPanel);
     addAndMakeVisible(stepSequencerPanel);
-    addAndMakeVisible(tabsPanel);
+    addAndMakeVisible(adsrPanel);
+
     setSize(768, 576);
 }
 
@@ -46,10 +47,10 @@ void SynthAudioProcessorEditor::resized()
 
     using Track = Grid::TrackInfo;
 
-    grid.templateRows    = { Track (2_fr), Track (1_fr), Track (4_fr) };
+    grid.templateRows    = { Track (5_fr), Track (5_fr), Track (12_fr) };
     grid.templateColumns = { Track (1_fr) };
 
-    grid.items = { GridItem (gemsPanel).withMargin(10), GridItem(tabsPanel).withMargin(10), GridItem (stepSequencerPanel).withMargin(10) };
+    grid.items = { GridItem (gemsPanel).withMargin(10), GridItem(adsrPanel).withMargin(10), GridItem (stepSequencerPanel).withMargin(10) };
 
     grid.performLayout (getLocalBounds());
 }

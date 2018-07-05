@@ -64,13 +64,18 @@ public:
     int synthStepCount[8];
     int currentSynthStep[8];
 
-    // globalSynthIsActiveInStep[stepId][synthId]
+    // globalSynthIsActiveInStep[stepId][gemId]
     bool globalSynthIsActiveInStep[16][8];
+
+    // [gemId][stepId][soundId]
     bool soundIsActiveInSynthStep[8][16][4];
 
+    /// map<midiNoteNumber, pair<gemId, synthId>>
     std::map<int, std::pair<int, int>> midiNoteToSynth;
+    Array<std::pair<int, int>> activeSynths;  
 private:
     //==============================================================================
+    // synths aka gems
     Synthesiser synths[8][4];
     MidiMessageCollector midiCollector;
 
