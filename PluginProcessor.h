@@ -16,7 +16,7 @@
 //==============================================================================
 /**
 */
-class SynthAudioProcessor  : public AudioProcessor
+class SynthAudioProcessor  : public AudioProcessor, public ChangeBroadcaster
 {
 public:
     //==============================================================================
@@ -71,8 +71,14 @@ public:
     bool soundIsActiveInSynthStep[8][16][4];
 
     /// map<midiNoteNumber, pair<gemId, synthId>>
-    std::map<int, std::pair<int, int>> midiNoteToSynth;
-    Array<std::pair<int, int>> activeSynths;  
+    std::map<String, std::pair<int, int>> midiNoteToSynth;
+    String synthIsActive[8][4];
+
+    double attackTime = 0.05;
+    double decayTime = 0.05;
+    double sustainLevel = 0;
+    double releaseTime = 0.05;
+
 private:
     //==============================================================================
     // synths aka gems

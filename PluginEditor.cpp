@@ -20,7 +20,21 @@ SynthAudioProcessorEditor::SynthAudioProcessorEditor (SynthAudioProcessor& p)
     addAndMakeVisible(stepSequencerPanel);
     addAndMakeVisible(adsrPanel);
 
+    adsrPanel.onAttackChange([&]() {
+        p.attackTime = adsrPanel.sliderAttack.getValue();
+    });
+
+    adsrPanel.onDecayChange([&]() {
+        p.decayTime = adsrPanel.sliderAttack.getValue();
+    });
+
+    adsrPanel.onReleaseChange([&]() {
+        p.releaseTime = adsrPanel.sliderAttack.getValue();
+    });
+
     setSize(768, 576);
+    
+    p.addChangeListener(this);
 }
 
 SynthAudioProcessorEditor::~SynthAudioProcessorEditor()
@@ -53,4 +67,8 @@ void SynthAudioProcessorEditor::resized()
     grid.items = { GridItem (gemsPanel).withMargin(10), GridItem(adsrPanel).withMargin(10), GridItem (stepSequencerPanel).withMargin(10) };
 
     grid.performLayout (getLocalBounds());
+}
+
+void SynthAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source) {
+    repaint();
 }

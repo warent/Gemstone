@@ -19,7 +19,7 @@
 //==============================================================================
 /**
 */
-class SynthAudioProcessorEditor  : public AudioProcessorEditor
+class SynthAudioProcessorEditor  : public AudioProcessorEditor, public ChangeListener
 {
 public:
     SynthAudioProcessorEditor (SynthAudioProcessor&);
@@ -28,6 +28,7 @@ public:
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
+    void changeListenerCallback(ChangeBroadcaster*) override;
 
 private:
     // This reference is provided as a quick way for your editor to

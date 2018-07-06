@@ -17,10 +17,26 @@ struct ADSRPanel : public Component {
       sliderSustain.setSliderStyle(Slider::SliderStyle::LinearVertical);
       sliderRelease.setSliderStyle(Slider::SliderStyle::LinearVertical);
 
+      sliderAttack.setRange(0.05, 60, 0.05);
+      sliderDecay.setRange(0.05, 60, 0.05);
+      sliderRelease.setRange(0.05, 60, 0.05);
+      
       addAndMakeVisible(sliderAttack);
       addAndMakeVisible(sliderDecay);
       addAndMakeVisible(sliderSustain);
       addAndMakeVisible(sliderRelease);
+  }
+
+  void onAttackChange(std::function<void()> onValueChange) {
+    sliderAttack.onValueChange = onValueChange;
+  }
+
+  void onDecayChange(std::function<void()> onValueChange) {
+    sliderDecay.onValueChange =  onValueChange;
+  }
+
+  void onReleaseChange(std::function<void()> onValueChange) {
+    sliderRelease.onValueChange = onValueChange;
   }
 
   void paint (Graphics& g) override {
@@ -51,8 +67,6 @@ struct ADSRPanel : public Component {
     fb.performLayout(getLocalBounds().toFloat());
   }
 
-
-private:
   Slider sliderAttack;
   Slider sliderDecay;
   Slider sliderSustain;

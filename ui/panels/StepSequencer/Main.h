@@ -78,6 +78,28 @@ struct StepSequencerPanel : public Component {
       );
       utilityButtonRow->setInterceptsMouseClicks(false, false);
     }
+
+    auto* buttonRow = panelButtons.stepButtonRows[processor.currentGlobalStep];
+    auto buttonRowBounds = buttonRow->getBoundsInParent();
+    g.setColour(Colour(0, 255, 0));
+    g.setOpacity(0.4);
+    g.fillRect(
+        panelButtonsBounds.getX(),
+        buttonRowBounds.getY(),
+        buttonRowBounds.getWidth(),
+        buttonRowBounds.getHeight()
+        );
+    
+    auto* utilityButtonRow = panelUtility.utilityButtonsRow[processor.currentGlobalStep];
+    auto utilityButtonRowBounds = utilityButtonRow->getBoundsInParent();
+    g.setColour(Colour(0, 255, 0));
+    g.setOpacity(0.4);
+    g.fillRect(
+        panelUtilityButtonsBounds.getX(),
+        utilityButtonRowBounds.getY(),
+        utilityButtonRowBounds.getWidth(),
+        utilityButtonRowBounds.getHeight()
+        );
   }
 
   void resized() override {

@@ -19,7 +19,7 @@ SynthAudioProcessor::SynthAudioProcessor()
 {
     for (auto i = 0; i < 8; i++) {
         for (auto j = 0; j < 4; j++) {
-            synths[i][j].addVoice(new SineWaveVoice());
+            synths[i][j].addVoice(new SineWaveVoice(*this));
             synths[i][j].addSound(new SineWaveSound());
             synths[i][j].setNoteStealingEnabled(true);
         }
@@ -152,10 +152,12 @@ void SynthAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& 
     int samplePosition = 0;
     MidiMessage midi;
 
-    Array<std::pair<MidiBuffer, std::pair<int, int>>> midiBufferForSynth;
-
+    std::map<int, bool> processedSynthId;
+    std::map<int, bool> processedSoundId;
+    
     MidiBuffer::Iterator it(midiMessages);
     while (it.getNextEvent(midi, samplePosition)) {
+        String midiNoteName = midi.getMidiNoteName(midi.getNoteNumber(), true, true, 4);
         bool isNoteOn = midi.isNoteOn();
         bool isNoteOff = midi.isNoteOff();
         if (isNoteOn) {
@@ -180,35 +182,42 @@ void SynthAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& 
             if (currentGlobalStep >= globalStepCount) {
                 currentGlobalStep = 0;
             }
+            
+            sendChangeMessage();
 
             if (selectedSynthId == -1) {
                 continue;
             }
-
-            midiBufferForSynth.add(std::pair<MidiBuffer, std::pair<int, int>>(MidiBuffer(MidiMessage(midi)), std::pair<int, int>(selectedSynthId, selectedSoundId)));
+            
+            processedSynthId[selectedSynthId] = true;
+            processedSoundId[selectedSoundId] = true;
+            auto singleBuffer = MidiBuffer(midi);
+            synths[selectedSynthId][selectedSoundId].renderNextBlock(buffer, singleBuffer, 0, buffer.getNumSamples());
+            synthIsActive[selectedSynthId][selectedSoundId] = midiNoteName;
+            midiNoteToSynth[midiNoteName] = std::pair<int, int>(selectedSynthId, selectedSoundId);
             
         } else if (isNoteOff) {
-            auto gemId = midiNoteToSynth[midi.getNoteNumber()].first;
-            auto soundId = midiNoteToSynth[midi.getNoteNumber()].second;
-            midiBufferForSynth.add(std::pair<MidiBuffer, std::pair<int, int>>(MidiBuffer(MidiMessage(midi)), std::pair<int, int>(gemId, soundId)));
+            auto gemId = midiNoteToSynth[midiNoteName].first;
+            auto soundId = midiNoteToSynth[midiNoteName].second;
+            if (synthIsActive[gemId][soundId] != midiNoteName) {
+                continue;
+            }
+            processedSynthId[gemId] = true;
+            processedSoundId[soundId] = true;
+            auto singleBuffer = MidiBuffer(midi);
+            synths[gemId][soundId].renderNextBlock(buffer, singleBuffer, 0, buffer.getNumSamples());
         }
-    }
-    
-    for (auto item : midiBufferForSynth) {
-        auto selectedSynthId = item.second.first;
-        auto selectedSoundId = item.second.second;
-        auto singleBuffer = item.first;
-        synths[selectedSynthId][selectedSoundId].renderNextBlock(buffer, singleBuffer, 0, buffer.getNumSamples());
-        midiNoteToSynth[midi.getNoteNumber()] = std::pair<int, int>(selectedSynthId, selectedSoundId);
     }
 
     midiMessages.clear();
-    
-    for (auto item : midiNoteToSynth) {
-        synths[item.second.first][item.second.second].renderNextBlock(buffer, MidiBuffer(), 0, buffer.getNumSamples());
+
+    for (auto synthId = 0; synthId < 8; synthId++) {
+        for (auto soundId = 0; soundId < 4; soundId++) {
+            if (!processedSynthId[synthId]) {
+                synths[synthId][soundId].renderNextBlock(buffer, MidiBuffer(), 0, buffer.getNumSamples());
+            }
+        }
     }
-    
-    
 }
 
 //==============================================================================
